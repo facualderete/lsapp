@@ -10,6 +10,17 @@ use Auth;
 class PostsController extends Controller
 {
     /**
+     * Create a new controller instance.
+     * The call to auth middleware will force all requests to redirect to login
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -77,6 +88,12 @@ class PostsController extends Controller
     public function edit($id)
     {
         $post = Post::find($id);
+
+        // verify user is owner of post
+        if (Auth::user()->id !== $post->user_id) {
+            return redirect('/posts')->with('error', 'Unauthorized');
+        }
+
         return view('posts.edit')->with('post', $post);
     }
 
@@ -96,6 +113,12 @@ class PostsController extends Controller
         ]);
 
         $post = Post::find($id);
+
+        // verify user is owner of post
+        if (Auth::user()->id !== $post->user_id) {
+            return redirect('/posts')->with('error', 'Unauthorized');
+        }
+
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->save();
@@ -112,8 +135,13 @@ class PostsController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
-        $post->delete();
 
+        // verify user is owner of post
+        if (Auth::user()->id !== $post->user_id) {
+            return redirect('/posts')->with('error', 'Unauthorized');
+        }
+
+        $post->delete();
         return redirect('/posts')->with('success', "Post id=$post->id Removed!");
     }
 }

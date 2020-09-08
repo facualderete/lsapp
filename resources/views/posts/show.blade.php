@@ -9,15 +9,21 @@
     <hr>
     <small>Written on {{ $post->created_at }} - {{ $post->user->name }}</small>
     <hr>
-    <a href="/posts/{{ $post->id }}/edit" class="btn btn-outline-secondary">Edit</a>
 
-    {!! Form::open([
-        'action' => ['PostsController@destroy', $post->id],
-        'method' => 'DELETE',
-        'class' => 'pull-right'
-    ]) !!}
+    @auth        
+        @if (Auth::user()->id == $post->user_id)            
+            <a href="/posts/{{ $post->id }}/edit" class="btn btn-outline-secondary">Edit</a>
 
-        {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
+            {!! Form::open([
+                'action' => ['PostsController@destroy', $post->id],
+                'method' => 'DELETE',
+                'class' => 'pull-right'
+            ]) !!}
 
-    {!! Form::close() !!}
+                {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
+
+            {!! Form::close() !!}
+        @endif
+    @endauth
+    
 @endsection

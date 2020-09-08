@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use DB;
+use Auth;
 
 class PostsController extends Controller
 {
@@ -47,6 +48,7 @@ class PostsController extends Controller
         ]);
 
         $post = new Post();
+        $post->user_id = Auth::user()->id;
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->save();
